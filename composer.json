@@ -1,0 +1,18 @@
+{
+    "name": "intech/tool",
+    "description": "Programming tools",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Intech\\Tool\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "MrWebAppDeveloper",
+            "email": "mahmodimahdi26@gmail.com"
+        }
+    ],
+    "require": {}
+}
