@@ -12,7 +12,7 @@ class Helper
      * @param mixed $value
      * @return void
      */
-    #[NoReturn] public function dd(mixed $value):void
+    #[NoReturn] public static function dd(mixed $value):void
     {
         var_dump($value);
 
