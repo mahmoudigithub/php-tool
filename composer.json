@@ -6,7 +6,10 @@
     "autoload": {
         "psr-4": {
             "Intech\\Tool\\": "src/"
-        }
+        },
+        "files": [
+            "src/facade.php"
+        ]
     },
     "authors": [
         {
