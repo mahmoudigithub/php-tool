@@ -7,12 +7,14 @@
  * @param mixed|null $value
  * @return string|null
  */
-function env(string $name, mixed $value = null):?string
-{
+if(!function_exists('env')){
+    function env(string $name, mixed $value = null):?string
+    {
         if($value){
             $_ENV[$name] = $value;
             return $value;
         }
 
         return $_ENV[$name] ?? null;
+    }
 }
