@@ -5,7 +5,8 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Intech\\Tool\\": "src/"
+            "Intech\\Tool\\": "src/",
+            "Tests\\" : "tests/"
         },
         "files": [
             "src/facade.php"
@@ -17,5 +18,7 @@
             "email": "mahmodimahdi26@gmail.com"
         }
     ],
-    "require": {}
+    "require": {
+        "phpunit/phpunit": "^11.0"
+    }
 }
