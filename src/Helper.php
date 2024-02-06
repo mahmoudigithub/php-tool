@@ -2,20 +2,34 @@
 
 namespace Intech\Tool;
 
+use Intech\Tool\Concretes\Helper\Debugging;
 use JetBrains\PhpStorm\NoReturn;
 
 class Helper
 {
     /**
-     * Dump and die
+     * Singleton property
      *
-     * @param mixed $value
-     * @return void
+     * Uses for keep instantiated helper concretes
+     * for prevent re-instantiate
+     *
+     * @var array
      */
-    #[NoReturn] public static function dd(mixed $value):void
-    {
-        var_dump($value);
+    private static array $instances;
 
-        exit;
+    /**
+     * Returns debugging instance
+     *
+     * Debugging instance has helper function for
+     * use in debugging code
+     *
+     * @return Debugging
+     */
+    public function debugging():Debugging
+    {
+        if(isset(self::$instances[Debugging::class]))
+            return self::$instances[Debugging::class];
+
+        return self::$instances[Debugging::class] = new Debugging();
     }
 }
