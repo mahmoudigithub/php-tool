@@ -107,4 +107,31 @@ class FileTest extends TestCase
         foreach ($paths as $path)
             $this->assertTrue(in_array($path, $res));
     }
+
+    /**
+     * Asserts ls function returns list of specific suffix files and directories
+     *
+     * @return void
+     */
+    public function test_ls_returns_list_of_specific_suffix_of_files_and_directories()
+    {
+        $contents = [
+            'test.txt',
+            'script.php',
+            'sub_php',
+        ];
+
+        foreach ($contents as $name)
+            if(str_contains($name, '.'))
+                $this->createFile($name);
+            else
+                $this->createDir($name);
+
+        $helper = $this->createFileHelper();
+
+        $paths = $helper->ls($this->fakeDirectory(), "*php");
+
+        foreach ($paths as $path)
+            $this->assertTrue(str_ends_with($path, 'php'));
+    }
 }
