@@ -14,18 +14,34 @@ class FileTest extends TestCase
     use HasConcreteFactory;
 
     /**
-     * This method tests reformat() helper function
+     * Asserts reformat function removes double slash
      *
      * @return void
      */
     public function test_reformat_path_for_double_back_slash()
     {
-        $path = "/test//test1";
+        $path = "test//test1";
 
         $helper = $this->createFileHelper();
 
         $path = $helper->reformat($path);
 
-        $this->assertSame("/test/test1" ,$path);
+        $this->assertSame("test/test1" ,$path);
+    }
+
+    /**
+     * Asserts reformat function removes extra slash at end of path
+     *
+     * @return void
+     */
+    public function test_reformat_removes_slash_at_end_of_path()
+    {
+        $path = "test/test1/";
+
+        $helper = $this->createFileHelper();
+
+        $path = $helper->reformat($path);
+
+        $this->assertSame("test/test1" ,$path);
     }
 }
