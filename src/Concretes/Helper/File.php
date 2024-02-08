@@ -38,7 +38,7 @@ class File
      */
     public function ls(string $directory, string $pattern = "*"):array|null
     {
-//        return glob($this->reformat($directory) . DIRECTORY_SEPARATOR . )
+        return glob($this->reformat($directory) . DIRECTORY_SEPARATOR . $pattern);
     }
 
     /**

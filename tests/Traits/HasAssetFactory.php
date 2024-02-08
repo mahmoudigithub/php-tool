@@ -4,7 +4,7 @@
  * Test trait uses for create directory and file for test
  */
 
-namespace Tests\Helper\Traits;
+namespace Tests\Traits;
 
 trait HasAssetFactory
 {

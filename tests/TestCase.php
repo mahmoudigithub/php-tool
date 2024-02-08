@@ -2,7 +2,7 @@
 
 namespace Tests;
 
-use Tests\Helper\Traits\HasAssetFactory;
+use Tests\Traits\HasAssetFactory;
 
 class TestCase extends \PHPUnit\Framework\TestCase
 {

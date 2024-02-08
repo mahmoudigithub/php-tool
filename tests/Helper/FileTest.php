@@ -6,12 +6,13 @@
 
 namespace Tests\Helper;
 
-use PHPUnit\Framework\TestCase;
 use Tests\Helper\Traits\HasConcreteFactory;
+use Tests\TestCase;
+use Tests\Traits\HasAssetFactory;
 
 class FileTest extends TestCase
 {
-    use HasConcreteFactory;
+    use HasConcreteFactory, HasAssetFactory;
 
     /**
      * Asserts reformat function removes double slash
@@ -76,5 +77,34 @@ class FileTest extends TestCase
 
         $this->assertSame(DIRECTORY_SEPARATOR . 'test' . DIRECTORY_SEPARATOR . 'test1' ,$path);
 
+    }
+
+    /**
+     * Asserts ls function returns list of files and directories in a directory with "directory/*" pattern
+     *
+     * @return void
+     */
+    public function test_ls_returns_list_of_all_of_files_and_directories()
+    {
+        $contents = [
+            'test.txt',
+            'test2.txt',
+            'sub',
+        ];
+
+        $paths = [];
+
+        foreach ($contents as $name)
+            if(str_contains($name, '.'))
+                $paths[] = $this->createFile($name);
+            else
+                $paths[] = $this->createDir($name);
+
+        $helper = $this->createFileHelper();
+
+        $res = $helper->ls($this->fakeDirectory());
+
+        foreach ($paths as $path)
+            $this->assertTrue(in_array($path, $res));
     }
 }
