@@ -44,4 +44,20 @@ class FileTest extends TestCase
 
         $this->assertSame("test/test1" ,$path);
     }
+
+    /**
+     * Assert reformat function doesn't remove slash at start of path
+     *
+     * @return void
+     */
+    public function test_reformat_does_not_remove_slash_at_start_of_path()
+    {
+        $path = "/test/test1";
+
+        $helper = $this->createFileHelper();
+
+        $path = $helper->reformat($path);
+
+        $this->assertSame("/test/test1" ,$path);
+    }
 }
