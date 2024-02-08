@@ -134,4 +134,32 @@ class FileTest extends TestCase
         foreach ($paths as $path)
             $this->assertTrue(str_ends_with($path, 'php'));
     }
+
+    /**
+     * Asserts ls function returns list of specific prefix files and directories
+     *
+     * @return void
+     */
+    public function test_ls_returns_list_of_specific_prefix_of_files_and_directories()
+    {
+        $contents = [
+            'config.php',
+            'script.txt',
+            'script.php',
+            'script_php',
+        ];
+
+        foreach ($contents as $name)
+            if(str_contains($name, '.'))
+                $this->createFile($name);
+            else
+                $this->createDir($name);
+
+        $helper = $this->createFileHelper();
+
+        $paths = $helper->ls($this->fakeDirectory(), "script*");
+
+        foreach ($paths as $path)
+            $this->assertTrue(str_starts_with(pathinfo($path, PATHINFO_FILENAME), 'script'));
+    }
 }
