@@ -60,4 +60,21 @@ class FileTest extends TestCase
 
         $this->assertSame("/test/test1" ,$path);
     }
+
+    /**
+     * Asserts reformat function replaces forwards-lashes or backslashes with directory separator
+     *
+     * @return void
+     */
+    public function test_reformat_replace_forward_or_back_slash_with_directory_separator()
+    {
+        $path = DIRECTORY_SEPARATOR == '/' ? '\test\test1': '/test/test1';
+
+        $helper = $this->createFileHelper();
+
+        $path = $helper->reformat($path);
+
+        $this->assertSame(DIRECTORY_SEPARATOR . 'test' . DIRECTORY_SEPARATOR . 'test1' ,$path);
+
+    }
 }
