@@ -65,19 +65,12 @@ class File
      */
     public function root():string|null
     {
-        $cwd = __DIR__;
-
-        $counter = 0;
-
+        $currentDir = null;
+        
         do{
-            if(($cwd = dirname($cwd)) == '.')
-                return null;
-
-            if(in_array(
-                $cwd . DIRECTORY_SEPARATOR . 'composer.json',
-                glob($cwd . DIRECTORY_SEPARATOR . '*json')
-            ))
-                return $cwd;
+            if(!$currentDir)
+                if(!$currentDir = $this->dirname(__DIR__))
+                    return null;
 
         } while(1);
     }
