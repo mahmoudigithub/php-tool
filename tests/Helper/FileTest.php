@@ -159,10 +159,10 @@ class FileTest extends TestCase
 
         $helper = $this->createFileHelper();
 
-        $paths = $helper->ls($this->fakeDirectory(), "script*");
+        $names = $helper->ls($this->fakeDirectory(), "script*");
 
-        foreach ($paths as $path)
-            $this->assertTrue(str_starts_with(pathinfo($path, PATHINFO_FILENAME), 'script'));
+        foreach ($names as $name)
+            $this->assertTrue(str_starts_with($name, 'script'));
     }
 
     /**
@@ -219,12 +219,12 @@ class FileTest extends TestCase
             ->method('ls')
             ->with('test/sub/parent')
             ->willReturn([
-                'test/sub/parent/vendor',
-                'test/sub/parent/composer.json'
+                'vendor',
+                'composer.json'
             ])
             ->with('test/sub/parent/vendor')
             ->willReturn([
-                'test/sub/parent/vendor/autoload.php'
+                'autoload.php'
             ]);
 
         $this->assertSame('test/sub/parent', $helper->root());
@@ -255,13 +255,13 @@ class FileTest extends TestCase
             ->method('ls')
             ->with('test/sub/parent')
             ->willReturn([
-                'test/sub/parent/vendor',
-                'test/sub/parent/composer.json'
+                'vendor',
+                'composer.json'
             ])
             ->with('test/sub/parent/vendor')
             ->willReturn([
-                'test/sub/parent/vendor/somethings.txt',
-                'test/sub/parent/vendor/autoload.txt',
+                'somethings.txt',
+                'autoload.txt',
             ]);
 
         $this->assertNull($helper->root());
@@ -292,17 +292,17 @@ class FileTest extends TestCase
             ->method('ls')
             ->with('test/sub/parent')
             ->willReturn([
-                'test/sub/parent/something.txt',
-                'test/sub/parent/some'
+                'something.txt',
+                'some'
             ])
             ->with('test/sub')
             ->willReturn([
-                'test/sub/vendor',
-                'test/sub/composer.json'
+                'vendor',
+                'composer.json'
             ])
             ->with('test/sub/vendor')
             ->willReturn([
-                'test/sub/vendor/autoload.php'
+                'autoload.php'
             ]);
 
         $this->assertSame('test/sub', $helper->root());
@@ -330,18 +330,18 @@ class FileTest extends TestCase
             ->method('ls')
             ->with('test/sub/parent')
             ->willReturn([
-                'test/sub/parent/something.txt',
-                'test/sub/parent/some'
+                'something.txt',
+                'some'
             ])
             ->with('test/sub')
             ->willReturn([
-                'test/sub/vendor',
-                'test/sub/composer.json'
+                'vendor',
+                'composer.json'
             ])
             ->with('test/sub/vendor')
             ->willReturn([
-                'test/sub/vendor/something.txt',
-                'test/sub/vendor/autoload.txt',
+                'something.txt',
+                'autoload.txt',
             ]);
 
         $this->assertSame('test/sub', $helper->root());

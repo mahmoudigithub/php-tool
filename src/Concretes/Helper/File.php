@@ -38,7 +38,17 @@ class File
      */
     public function ls(string $directory, string $pattern = "*"):array|null
     {
-        return glob($this->reformat($directory) . DIRECTORY_SEPARATOR . $pattern);
+        $list = glob($this->reformat($directory) . DIRECTORY_SEPARATOR . $pattern);
+
+        if(!$list)
+            return null;
+
+        $namesList = [];
+
+        foreach ($list as $path)
+            $namesList[] = basename($pattern);
+
+        return $namesList;
     }
 
     /**
@@ -66,11 +76,21 @@ class File
     public function root():string|null
     {
         $currentDir = null;
-        
+
         do{
             if(!$currentDir)
                 if(!$currentDir = $this->dirname(__DIR__))
                     return null;
+            else
+                if(!$currentDir = $this->dirname($currentDir))
+                    return null;
+
+            if(!$list = $this->ls($currentDir))
+                return null;
+
+
+
+//            if(in_array())
 
         } while(1);
     }
