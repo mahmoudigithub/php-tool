@@ -6,6 +6,7 @@
 
 namespace Tests\Helper;
 
+use Intech\Tool\Concretes\Helper\File;
 use Tests\Helper\Traits\HasConcreteFactory;
 use Tests\TestCase;
 use Tests\Traits\HasAssetFactory;
@@ -161,5 +162,19 @@ class FileTest extends TestCase
 
         foreach ($paths as $path)
             $this->assertTrue(str_starts_with(pathinfo($path, PATHINFO_FILENAME), 'script'));
+    }
+
+    /**
+     * Asserts dirname helper function returns correct address
+     *
+     * @return void
+     */
+    public function test_dirname_function_returns_correct_path()
+    {
+        $path = $this->createFile('test.txt', 'It just for testing .');
+
+        $helper = $this->createFileHelper();
+
+        $this->assertSame(dirname($path), $helper->dirname($path));
     }
 }

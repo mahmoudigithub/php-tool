@@ -20,4 +20,14 @@ trait HasConcreteFactory
     {
         return Helper::file();
     }
+
+    /**
+     * Returns file helper class name
+     *
+     * @return string
+     */
+    public function fileHelperClassname():string
+    {
+        return File::class;
+    }
 }

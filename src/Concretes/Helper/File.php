@@ -42,6 +42,20 @@ class File
     }
 
     /**
+     * Returns dirname of path
+     *
+     * @param string $path
+     * @return string|null
+     */
+    public function dirname(string $path):string|null
+    {
+        if(!$dir = dirname($path))
+            return null;
+
+        return $this->reformat($dir);
+    }
+
+    /**
      * Returns app root directory
      *
      * It finds parent directory that
