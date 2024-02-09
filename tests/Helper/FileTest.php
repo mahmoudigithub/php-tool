@@ -7,6 +7,7 @@
 namespace Tests\Helper;
 
 use Intech\Tool\Concretes\Helper\File;
+use PHPUnit\Framework\MockObject\Exception;
 use Tests\Helper\Traits\HasConcreteFactory;
 use Tests\TestCase;
 use Tests\Traits\HasAssetFactory;
@@ -176,5 +177,173 @@ class FileTest extends TestCase
         $helper = $this->createFileHelper();
 
         $this->assertSame(dirname($path), $helper->dirname($path));
+    }
+
+    /**
+     * Asserts root function returns false when there is no parent directory for current file directory
+     *
+     * @return void
+     * @throws Exception
+     */
+    public function test_root_function_returns_false_when_there_is_no_parent_folder_for_current_executing_file_directory()
+    {
+        $helper = $this->createPartialMock(
+            $this->fileHelperClassname(), ['dirname']);
+
+        $helper->expects($this->once())
+            ->method('dirname')
+            ->willReturn(null);
+
+        $this->assertNull($helper->root());
+    }
+
+    /**
+     * Asserts root function helper returns path of parent directory of current file directory when that is according the conditions
+     *
+     * Test that helper returns path of parent directory of current executing file directory
+     * when there is composer.json and vendor that has autoload.php
+     *
+     * @return void
+     * @throws Exception
+     */
+    public function test_root_function_returns_parent_directory_path_of_current_executing_file_when_that_is_according_to_the_conditions()
+    {
+        $helper = $this->createPartialMock(
+            $this->fileHelperClassname(), ['dirname', 'ls']);
+
+        $helper->expects($this->once())
+            ->method('dirname')
+            ->willReturn('test/sub/parent');
+
+        $helper->expects($this->exactly(2))
+            ->method('ls')
+            ->with('test/sub/parent')
+            ->willReturn([
+                'test/sub/parent/vendor',
+                'test/sub/parent/composer.json'
+            ])
+            ->with('test/sub/parent/vendor')
+            ->willReturn([
+                'test/sub/parent/vendor/autoload.php'
+            ]);
+
+        $this->assertSame('test/sub/parent', $helper->root());
+    }
+
+    /**
+     * Asserts root function helper returns null when that is according the conditions except autoload.php
+     *
+     * Test that helper returns path of parent directory of current executing file directory
+     * when there is composer.json and vendor that has not autoload.php
+     *
+     * @return void
+     * @throws Exception
+     */
+    public function test_root_function_returns_null_when_that_is_according_to_the_conditions_except_autoload()
+    {
+        $helper = $this->createPartialMock(
+            $this->fileHelperClassname(), ['dirname', 'ls']);
+
+        $helper->expects($this->exactly(2))
+            ->method('dirname')
+            ->with($this->any())
+            ->willReturn('test/sub/parent')
+            ->with('test/sub/parent')
+            ->willReturn(null);
+
+        $helper->expects($this->exactly(2))
+            ->method('ls')
+            ->with('test/sub/parent')
+            ->willReturn([
+                'test/sub/parent/vendor',
+                'test/sub/parent/composer.json'
+            ])
+            ->with('test/sub/parent/vendor')
+            ->willReturn([
+                'test/sub/parent/vendor/somethings.txt',
+                'test/sub/parent/vendor/autoload.txt',
+            ]);
+
+        $this->assertNull($helper->root());
+    }
+
+    /**
+     * Asserts root function helper returns path of a directory when that is according the conditions
+     *
+     * Test that helper returns path a directory when there is composer.json and vendor that has
+     * autoload.php in that directory
+     *
+     * @return void
+     * @throws Exception
+     */
+    public function test_root_function_returns_a_directory_path_of_when_that_is_according_to_the_conditions()
+    {
+        $helper = $this->createPartialMock(
+            $this->fileHelperClassname(), ['dirname', 'ls']);
+
+        $helper->expects($this->once())
+            ->method('dirname')
+            ->with($this->any())
+            ->willReturn('test/sub/parent')
+            ->with('test/sub/parent')
+            ->willReturn('test/sub');
+
+        $helper->expects($this->exactly(2))
+            ->method('ls')
+            ->with('test/sub/parent')
+            ->willReturn([
+                'test/sub/parent/something.txt',
+                'test/sub/parent/some'
+            ])
+            ->with('test/sub')
+            ->willReturn([
+                'test/sub/vendor',
+                'test/sub/composer.json'
+            ])
+            ->with('test/sub/vendor')
+            ->willReturn([
+                'test/sub/vendor/autoload.php'
+            ]);
+
+        $this->assertSame('test/sub', $helper->root());
+    }
+
+    /**
+     * Asserts root function helper returns null when there is no directory that according the conditions
+     *
+     * @return void
+     * @throws Exception
+     */
+    public function test_root_function_returns_null_when_there_is_no_directory_that_is_according_to_the_conditions()
+    {
+        $helper = $this->createPartialMock(
+            $this->fileHelperClassname(), ['dirname', 'ls']);
+
+        $helper->expects($this->once())
+            ->method('dirname')
+            ->with($this->any())
+            ->willReturn('test/sub/parent')
+            ->with('test/sub/parent')
+            ->willReturn('test/sub');
+
+        $helper->expects($this->exactly(2))
+            ->method('ls')
+            ->with('test/sub/parent')
+            ->willReturn([
+                'test/sub/parent/something.txt',
+                'test/sub/parent/some'
+            ])
+            ->with('test/sub')
+            ->willReturn([
+                'test/sub/vendor',
+                'test/sub/composer.json'
+            ])
+            ->with('test/sub/vendor')
+            ->willReturn([
+                'test/sub/vendor/something.txt',
+                'test/sub/vendor/autoload.txt',
+            ]);
+
+        $this->assertSame('test/sub', $helper->root());
     }
 }
