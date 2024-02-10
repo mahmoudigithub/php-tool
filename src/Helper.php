@@ -9,14 +9,37 @@ use JetBrains\PhpStorm\NoReturn;
 class Helper
 {
     /**
-     * Singleton property
+     * Singleton property for concrete instances
      *
      * Uses for keep instantiated helper concretes
      * for prevent re-instantiate
      *
      * @var array
      */
-    private static array $instances;
+    private static array $concretes;
+
+    /**
+     * Singleton property for current class instance
+     *
+     * Uses for keep instantiated helper instance
+     * for prevent re-instantiate
+     *
+     * @var Helper
+     */
+    private static Helper $singleton;
+
+    /**
+     * Singleton method for get current class instance
+     * 
+     * @return Helper
+     */
+    public static function instance():Helper
+    {
+        if(!isset(self::$singleton))
+            self::$singleton = new self;
+
+        return self::$singleton;
+    }
 
     /**
      * Returns debugging helper concrete instance
@@ -28,10 +51,10 @@ class Helper
      */
     public static function debugging():Debugging
     {
-        if(isset(self::$instances[Debugging::class]))
-            return self::$instances[Debugging::class];
+        if(isset(self::$concretes[Debugging::class]))
+            return self::$concretes[Debugging::class];
 
-        return self::$instances[Debugging::class] = new Debugging();
+        return self::$concretes[Debugging::class] = new Debugging(self::instance());
     }
 
     /**
@@ -44,10 +67,10 @@ class Helper
      */
     public static function file():File
     {
-        if(isset(self::$instances[File::class]))
-            return self::$instances[File::class];
+        if(isset(self::$concretes[File::class]))
+            return self::$concretes[File::class];
 
-        return self::$instances[File::class] = new File;
+        return self::$concretes[File::class] = new File(self::instance());
     }
 
 

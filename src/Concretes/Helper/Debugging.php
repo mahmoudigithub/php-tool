@@ -2,10 +2,18 @@
 
 namespace Intech\Tool\Concretes\Helper;
 
+use Intech\Tool\Helper;
 use JetBrains\PhpStorm\NoReturn;
 
-class Debugging
+class Debugging implements IHelperConcrete
 {
+    /**
+     * @param Helper $helper
+     */
+    public function __construct(
+        private Helper $helper
+    ){}
+
     /**
      * Dump and die
      *

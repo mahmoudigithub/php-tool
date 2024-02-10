@@ -10,8 +10,17 @@ namespace Intech\Tool\Concretes\Helper;
 
 use Intech\Tool\Helper;
 
-class File
+class File implements IHelperConcrete
 {
+    /**
+     * Bridge
+     *
+     * @param Helper $helper
+     */
+    public function __construct(
+        private Helper $helper
+    ){}
+
     /**
      * Reformat path and returns
      *
