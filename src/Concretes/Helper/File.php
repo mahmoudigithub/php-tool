@@ -8,6 +8,8 @@
 
 namespace Intech\Tool\Concretes\Helper;
 
+use Intech\Tool\Helper;
+
 class File
 {
     /**
@@ -20,7 +22,7 @@ class File
      * @param string $path
      * @return string
      */
-    public function reformat(string $path):string
+    public function reformat(string $path): string
     {
         $path = str_replace(['/', '\\', '//', '\\\\'], DIRECTORY_SEPARATOR, $path);
 
@@ -36,17 +38,17 @@ class File
      * @return array|null return an array if $directory is exists path,
      * else returns null
      */
-    public function ls(string $directory, string $pattern = "*"):array|null
+    public function ls(string $directory, string $pattern = "*"): array|null
     {
         $list = glob($this->reformat($directory) . DIRECTORY_SEPARATOR . $pattern);
 
-        if(!$list)
+        if (!$list)
             return null;
 
         $namesList = [];
 
         foreach ($list as $path)
-            $namesList[] = basename($pattern);
+            $namesList[] = basename($path);
 
         return $namesList;
     }
@@ -57,9 +59,9 @@ class File
      * @param string $path
      * @return string|null
      */
-    public function dirname(string $path):string|null
+    public function dirname(string $path): string|null
     {
-        if(!$dir = dirname($path))
+        if (!$dir = dirname($path))
             return null;
 
         return $this->reformat($dir);
@@ -69,29 +71,36 @@ class File
      * Returns app root directory
      *
      * It finds parent directory that
-     * contains composer.json file
+     * contains composer.json file and
+     * vendor directory that has autoload.php
+     * return its address as root directory
+     * else returns null
      *
      * @return string|null
      */
-    public function root():string|null
+    public function root(): string|null
     {
         $currentDir = null;
 
-        do{
-            if(!$currentDir)
-                if(!$currentDir = $this->dirname(__DIR__))
-                    return null;
-            else
-                if(!$currentDir = $this->dirname($currentDir))
-                    return null;
+        do {
+            $currentDir = !$currentDir ? $this->dirname(__DIR__) : $this->dirname($currentDir);
 
-            if(!$list = $this->ls($currentDir))
+            if (!$currentDir || !$list = $this->ls($currentDir))
                 return null;
 
+            if (!in_array('composer.json', $list) or !in_array('vendor', $list))
+                continue;
 
+            $vendorPath = $this->reformat($currentDir . DIRECTORY_SEPARATOR . 'vendor');
 
-//            if(in_array())
+            if (!$vendorList = $this->ls($vendorPath))
+                return null;
 
-        } while(1);
+            if (!in_array('autoload.php', $vendorList))
+                continue;
+
+            return $currentDir;
+
+        } while (1);
     }
 }

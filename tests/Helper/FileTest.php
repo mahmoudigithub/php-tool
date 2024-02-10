@@ -6,7 +6,6 @@
 
 namespace Tests\Helper;
 
-use Intech\Tool\Concretes\Helper\File;
 use PHPUnit\Framework\MockObject\Exception;
 use Tests\Helper\Traits\HasConcreteFactory;
 use Tests\TestCase;
@@ -29,7 +28,7 @@ class FileTest extends TestCase
 
         $path = $helper->reformat($path);
 
-        $this->assertSame("test/test1" ,$path);
+        $this->assertSame("test/test1", $path);
     }
 
     /**
@@ -45,7 +44,7 @@ class FileTest extends TestCase
 
         $path = $helper->reformat($path);
 
-        $this->assertSame("test/test1" ,$path);
+        $this->assertSame("test/test1", $path);
     }
 
     /**
@@ -61,7 +60,7 @@ class FileTest extends TestCase
 
         $path = $helper->reformat($path);
 
-        $this->assertSame("/test/test1" ,$path);
+        $this->assertSame("/test/test1", $path);
     }
 
     /**
@@ -71,13 +70,13 @@ class FileTest extends TestCase
      */
     public function test_reformat_replace_forward_or_back_slash_with_directory_separator()
     {
-        $path = DIRECTORY_SEPARATOR == '/' ? '\test\test1': '/test/test1';
+        $path = DIRECTORY_SEPARATOR == '/' ? '\test\test1' : '/test/test1';
 
         $helper = $this->createFileHelper();
 
         $path = $helper->reformat($path);
 
-        $this->assertSame(DIRECTORY_SEPARATOR . 'test' . DIRECTORY_SEPARATOR . 'test1' ,$path);
+        $this->assertSame(DIRECTORY_SEPARATOR . 'test' . DIRECTORY_SEPARATOR . 'test1', $path);
 
     }
 
@@ -97,7 +96,7 @@ class FileTest extends TestCase
         $paths = [];
 
         foreach ($contents as $name)
-            if(str_contains($name, '.'))
+            if (str_contains($name, '.'))
                 $paths[] = $this->createFile($name);
             else
                 $paths[] = $this->createDir($name);
@@ -107,7 +106,7 @@ class FileTest extends TestCase
         $res = $helper->ls($this->fakeDirectory());
 
         foreach ($paths as $path)
-            $this->assertTrue(in_array($path, $res));
+            $this->assertTrue(in_array(basename($path), $res));
     }
 
     /**
@@ -124,7 +123,7 @@ class FileTest extends TestCase
         ];
 
         foreach ($contents as $name)
-            if(str_contains($name, '.'))
+            if (str_contains($name, '.'))
                 $this->createFile($name);
             else
                 $this->createDir($name);
@@ -152,7 +151,7 @@ class FileTest extends TestCase
         ];
 
         foreach ($contents as $name)
-            if(str_contains($name, '.'))
+            if (str_contains($name, '.'))
                 $this->createFile($name);
             else
                 $this->createDir($name);
@@ -215,23 +214,31 @@ class FileTest extends TestCase
             ->method('dirname')
             ->willReturn('test/sub/parent');
 
+        $lsReturnMap = [
+            [
+                'test/sub/parent',
+                [
+                    'vendor',
+                    'composer.json'
+                ]
+            ],
+            [
+                'test/sub/parent/vendor',
+                [
+                    'autoload.php'
+                ]
+            ]
+        ];
+
         $helper->expects($this->exactly(2))
             ->method('ls')
-            ->with('test/sub/parent')
-            ->willReturn([
-                'vendor',
-                'composer.json'
-            ])
-            ->with('test/sub/parent/vendor')
-            ->willReturn([
-                'autoload.php'
-            ]);
+            ->willReturnMap($lsReturnMap);
 
         $this->assertSame('test/sub/parent', $helper->root());
     }
 
     /**
-     * Asserts root function helper returns null when that is according the conditions except autoload.php
+     * Asserts root function helper returns null when that parent directory of current executing file directory is according the conditions except autoload.php
      *
      * Test that helper returns path of parent directory of current executing file directory
      * when there is composer.json and vendor that has not autoload.php
@@ -239,30 +246,41 @@ class FileTest extends TestCase
      * @return void
      * @throws Exception
      */
-    public function test_root_function_returns_null_when_that_is_according_to_the_conditions_except_autoload()
+    public function test_root_function_returns_null_when_that_parent_directory_of_current_executing_file_directory_is_according_to_the_conditions_except_autoload()
     {
         $helper = $this->createPartialMock(
             $this->fileHelperClassname(), ['dirname', 'ls']);
 
         $helper->expects($this->exactly(2))
             ->method('dirname')
-            ->with($this->any())
-            ->willReturn('test/sub/parent')
-            ->with('test/sub/parent')
-            ->willReturn(null);
+            ->willReturnCallback(function ($arg) {
+                if ($arg === 'test/sub/parent') {
+                    return null;
+                } else {
+                    return 'test/sub/parent';
+                }
+            });
+
+        $lsReturnMap = [
+            [
+                'test/sub/parent',
+                [
+                    'vendor',
+                    'composer.json'
+                ]
+            ],
+            [
+                'test/sub/parent/vendor',
+                [
+                    'somethings.txt',
+                    'autoload.txt',
+                ]
+            ]
+        ];
 
         $helper->expects($this->exactly(2))
             ->method('ls')
-            ->with('test/sub/parent')
-            ->willReturn([
-                'vendor',
-                'composer.json'
-            ])
-            ->with('test/sub/parent/vendor')
-            ->willReturn([
-                'somethings.txt',
-                'autoload.txt',
-            ]);
+            ->willReturnMap($lsReturnMap);
 
         $this->assertNull($helper->root());
     }
@@ -276,34 +294,45 @@ class FileTest extends TestCase
      * @return void
      * @throws Exception
      */
-    public function test_root_function_returns_a_directory_path_of_when_that_is_according_to_the_conditions()
+    public function test_root_function_returns_a_directory_path_when_that_is_according_to_the_conditions()
     {
         $helper = $this->createPartialMock(
             $this->fileHelperClassname(), ['dirname', 'ls']);
 
-        $helper->expects($this->once())
-            ->method('dirname')
-            ->with($this->any())
-            ->willReturn('test/sub/parent')
-            ->with('test/sub/parent')
-            ->willReturn('test/sub');
-
         $helper->expects($this->exactly(2))
+            ->method('dirname')
+            ->willReturnCallback(function (string $path){
+               return $path == 'test/sub/parent'?
+                   'test/sub':
+                   'test/sub/parent';
+            });
+
+        $lsMap = [
+            [
+                'test/sub/parent',
+                [
+                    'something.txt',
+                    'some'
+                ]
+            ],
+            [
+                'test/sub',
+                [
+                    'vendor',
+                    'composer.json'
+                ]
+            ],
+            [
+                'test/sub/vendor',
+                [
+                    'autoload.php'
+                ]
+            ]
+        ];
+
+        $helper->expects($this->exactly(3))
             ->method('ls')
-            ->with('test/sub/parent')
-            ->willReturn([
-                'something.txt',
-                'some'
-            ])
-            ->with('test/sub')
-            ->willReturn([
-                'vendor',
-                'composer.json'
-            ])
-            ->with('test/sub/vendor')
-            ->willReturn([
-                'autoload.php'
-            ]);
+            ->willReturnMap($lsMap);
 
         $this->assertSame('test/sub', $helper->root());
     }
@@ -319,31 +348,44 @@ class FileTest extends TestCase
         $helper = $this->createPartialMock(
             $this->fileHelperClassname(), ['dirname', 'ls']);
 
-        $helper->expects($this->once())
+        $helper->expects($this->exactly(3))
             ->method('dirname')
-            ->with($this->any())
-            ->willReturn('test/sub/parent')
-            ->with('test/sub/parent')
-            ->willReturn('test/sub');
+            ->willReturnCallback(function (string $path){
+                return match ($path) {
+                    'test/sub/parent' => 'test/sub',
+                    'test/sub' => null,
+                    default => 'test/sub/parent',
+                };
+            });
 
-        $helper->expects($this->exactly(2))
+        $lsMap = [
+            [
+                'test/sub/parent',
+                [
+                    'something.txt',
+                    'some'
+                ]
+            ],
+            [
+                'test/sub',
+                [
+                    'vendor',
+                    'composer.json'
+                ]
+            ],
+            [
+                'test/sub/vendor',
+                [
+                    'something.txt',
+                    'autoload.txt',
+                ]
+            ]
+        ];
+
+        $helper->expects($this->exactly(3))
             ->method('ls')
-            ->with('test/sub/parent')
-            ->willReturn([
-                'something.txt',
-                'some'
-            ])
-            ->with('test/sub')
-            ->willReturn([
-                'vendor',
-                'composer.json'
-            ])
-            ->with('test/sub/vendor')
-            ->willReturn([
-                'something.txt',
-                'autoload.txt',
-            ]);
+            ->willReturnMap($lsMap);
 
-        $this->assertSame('test/sub', $helper->root());
+        $this->assertNull($helper->root());
     }
 }
