@@ -1,5 +1,5 @@
 {
-    "name": "irannewtech/tool",
+    "name": "mahmoudigithub/php-tool",
     "description": "Programming tools",
     "type": "library",
     "license": "MIT",
@@ -14,7 +14,7 @@
     },
     "authors": [
         {
-            "name": "MrWebAppDeveloper",
+            "name": "Mahdi Mahmoudi",
             "email": "mahmodimahdi26@gmail.com"
         }
     ],
